@@ -3,17 +3,22 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const path = require("path");
+const helmet = require("helmet");
+const dotenv = require("dotenv").config();
+
+console.log(process.env.PORT)
+
 // Les Routes
 const userRoutes = require("./routes/user");
 const sauceRoutes = require("./routes/sauce");
 
 // Connection à MongoDB avec Mongoose
-mongoose.connect('mongodb+srv://Neminounet:suikoden@cluster0.874a9.mongodb.net/p6?retryWrites=true&w=majority',
+mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_CLUSTER}.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
-
+  
 // Headers
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -24,6 +29,9 @@ app.use((req, res, next) => {
 
 // Body-Parser
 app.use(express.json());
+
+// Helmet 
+app.use(helmet());
 
 // Chemin vers dossier Statique, ici images
 app.use('/images', express.static(path.join(__dirname, "images")));
